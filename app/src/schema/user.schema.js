@@ -16,13 +16,6 @@ const protection = z.object({
     .min(3,{message: "password must be or longer than 3 letters"})
     .uppercase(1),
 
-    name: z
-    .string()
-    .max(30, {message: "Name should be under 30 characters"}),
-
-    bio: z
-    .string()
-    .max(300, {message: "bio should be under this"})
 })
 
 module.exports = {

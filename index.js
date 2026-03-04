@@ -11,7 +11,8 @@ app.use(express.json());
 
 app.use("/api/v1/user", user);
 
-app.use(errorMiddleware)
+app.use(errorMiddleware);
+
 async function main(){
     mongoose.set('strictQuery', false);
     await mongoose.connect(process.env.MONGO_URL)
