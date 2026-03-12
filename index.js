@@ -3,10 +3,12 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { user } = require('./app/src/routes/route');
 const { errorMiddleware } = require('./app/src/middleware/error-middleware');
+const cors = require('cors')
 
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 
 app.use("/api/v1/user", user);

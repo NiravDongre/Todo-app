@@ -13,10 +13,10 @@ user.post("/signin", signin);
 user.get("/profile", userMiddleware , profile);
 user.put("/profile/edit", userMiddleware, profiledit);
 
-user.post("/todo", userMiddleware, todo);
-user.get("/todo", userMiddleware, getTodo);
-user.put("/todo", userMiddleware, updatetodo);
-user.delete("/todo", userMiddleware, deletetodo)
+user.post("/todo", todo);
+user.get("/todo", getTodo);
+user.put("/todo", updatetodo);
+user.delete("/todo", deletetodo)
 
 
 module.exports = {

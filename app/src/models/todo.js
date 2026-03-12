@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
 
 const todo = new Schema({
-    title: {type: String},
+    title: String,
     complete: {type: Boolean, default: false},
     userid: { type: ObjectId } ,
     createdAt: {type: Date, default: Date.now}

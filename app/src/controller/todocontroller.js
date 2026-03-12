@@ -3,7 +3,7 @@ const { Todomodel } = require('../models/todo')
 
 const todo = async(req, res, next) => {
     const user = req.userid;
-    const {title} = req.body;
+    const { title } = req.body;
     if(!title){
         return res.json({
             message: "Incorrect Credintial"
@@ -34,7 +34,7 @@ const getTodo = async(req, res, next) => {
     try{
     const userid = req.userid;
 
-    const todos = await Todomodel.find({userid}).select('-__v');
+    const todos = await Todomodel.find().select('-__v');
     
     if(!todos){
         return res.status(404).json({
@@ -43,8 +43,7 @@ const getTodo = async(req, res, next) => {
     }
 
     return res.status(200).json({
-        todo: "Todos you have created are here",
-        todos
+        todos: todos
     })
 }catch(e){
     next(e)
