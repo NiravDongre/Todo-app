@@ -11,12 +11,12 @@ user.post("/signup", signup);
 user.post("/signin", signin);
 
 user.get("/profile", userMiddleware , profile);
-user.put("/profile/edit", userMiddleware, profiledit);
+user.put("/profile/edit/:id", userMiddleware, profiledit);
 
-user.post("/todo", todo);
-user.get("/todo", getTodo);
-user.put("/todo", updatetodo);
-user.delete("/todo", deletetodo)
+user.post("/todo", userMiddleware, todo);
+user.get("/todo", userMiddleware,getTodo);
+user.put("/todo/:id", userMiddleware, updatetodo);
+user.delete("/todo/:id", userMiddleware, deletetodo)
 
 
 module.exports = {

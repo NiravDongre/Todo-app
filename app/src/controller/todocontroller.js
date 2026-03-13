@@ -21,7 +21,8 @@ const todo = async(req, res, next) => {
         })
     }
     return res.status(201).json({
-        message: "Todo has created"
+        message: "Todo has created",
+        todo: todo
     })
 }catch(e){
     next(e)
@@ -34,7 +35,7 @@ const getTodo = async(req, res, next) => {
     try{
     const userid = req.userid;
 
-    const todos = await Todomodel.find().select('-__v');
+    const todos = await Todomodel.find(userid).select('-__v');
     
     if(!todos){
         return res.status(404).json({
