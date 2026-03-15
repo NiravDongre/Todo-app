@@ -108,12 +108,22 @@ document.getElementById("switch-to-login").addEventListener("click", () => {
 
 todoButton.addEventListener("click", async () => {
 
-    const title = todoInput.value;
+    const title = todoInput.value.trim();
+    if (!title) {
+        alert("Please enter a todo title.");
+        return;
+    }
+
+    todoButton.disabled = true;
+    todoButton.textContent = "Adding...";
+
     const token = getStoredToken();
     if (!token) {
         alert("Please login first.");
         LoginContainer.style.display = "block";
         TodoContainer.style.display = "none";
+        todoButton.disabled = false;
+        todoButton.textContent = "Add Todo";
         return;
     }
 
@@ -132,7 +142,11 @@ todoButton.addEventListener("click", async () => {
         alert(data.message);
     }
 
+    todoButton.disabled = false;
+    todoButton.textContent = "Add Todo";
 });
+
+
 
 
 
@@ -167,6 +181,7 @@ async function loadTodos(){
 
             div.innerHTML = `
                 <p>${todo.title}</p>
+                <button onclick="editTodo('${todo._id}', '${todo.title}', this)">Edit</button>
                 <button onclick="deleteTodo('${todo._id}')">Delete</button>
             `;
 
@@ -202,6 +217,67 @@ async function deleteTodo(id){
 
     loadTodos();
 
+}
+
+/* ---------------- EDIT TODO ---------------- */
+
+function editTodo(id, currentTitle, editButton) {
+    const div = editButton.parentElement;
+    const originalHTML = div.innerHTML;
+
+    div.innerHTML = `
+        <input type="text" value="${currentTitle}" id="edit-input-${id}">
+        <button onclick="saveTodo('${id}', this)">Save</button>
+        <button onclick="cancelEdit('${id}', ${JSON.stringify(currentTitle)}, this)">Cancel</button>
+    `;
+}
+
+async function saveTodo(id, saveButton) {
+    const div = saveButton.parentElement;
+    const input = div.querySelector(`#edit-input-${id}`);
+    const newTitle = input.value.trim();
+
+    if (!newTitle) {
+        alert("Title cannot be empty");
+        return;
+    }
+
+    const saveBtn = div.querySelector('button[onclick*="saveTodo"]');
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Saving...";
+
+    const token = getStoredToken();
+    if (!token) {
+        alert("Please login first.");
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Save";
+        return;
+    }
+
+    const response = await fetch(`http://localhost:3000/api/v1/user/todo/${id}`, {
+        method: "PUT",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ title: newTitle })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+        loadTodos();
+    } else {
+        alert(data.message || "Failed to update todo");
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Save";
+    }
+}
+
+function cancelEdit(id, originalTitle, cancelButton) {
+    const div = cancelButton.parentElement;
+    div.innerHTML = `
+        <p>${originalTitle}</p>
+        <button onclick="editTodo('${id}', '${originalTitle.replace(/'/g, "\\'")}', this)">Edit</button>
+        <button onclick="deleteTodo('${id}')">Delete</button>
+    `;
 }
 
 function getStoredToken() {
