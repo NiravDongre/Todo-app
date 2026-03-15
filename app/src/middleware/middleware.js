@@ -15,9 +15,9 @@ const userMiddleware = async (req, res, next) =>{
     req.userid = response.id
     next()
     }catch(e){
-        err.status = 401;
-        err.message = "The token is incorrect or expired"
-        next(err)
+        e.status = 401;
+        e.message = "The token is incorrect or expired"
+        next(e)
     }
 
 }

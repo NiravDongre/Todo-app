@@ -1,5 +1,5 @@
-const RegistorContainer = document.getElementById("Registor");
-const RegistorForm = document.getElementById("registor");
+const RegisterContainer = document.getElementById("Register");
+const RegisterForm = document.getElementById("register");
 
 const LoginContainer = document.getElementById("Login");
 const LoginForm = document.getElementById("login");
@@ -14,7 +14,7 @@ const todoList = document.getElementById("todo-list");
 
 /* ---------------- REGISTER ---------------- */
 
-RegistorForm.addEventListener("submit", async (e) => {
+RegisterForm.addEventListener("submit", async (e) => {
 
     e.preventDefault();
 
@@ -36,11 +36,12 @@ RegistorForm.addEventListener("submit", async (e) => {
 
     const data = await response.json();
 
+    console.log(data)
     if(response.ok){
 
         alert("Registration successful");
 
-        RegistorContainer.style.display = "none";
+        RegisterContainer.style.display = "none";
         LoginContainer.style.display = "block";
 
     }else{
@@ -60,38 +61,45 @@ LoginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const username = document.getElementById("login-username").value;
-    const email = document.getElementById("login-email").value;
     const password = document.getElementById("login-password").value;
 
     const response = await fetch("http://localhost:3000/api/v1/user/signin", {
-
         method: "POST",
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({ username, email, password })
-
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
     });
 
     const data = await response.json();
 
     if(response.ok){
-
-        localStorage.setItem("token", data.token);
+        const token = extractToken(data);
+        if (token) {
+            localStorage.setItem("token", token);
+        }
 
         LoginContainer.style.display = "none";
         TodoContainer.style.display = "block";
 
         loadTodos();
 
-    }else{
-
+    } else {
         alert(data.message);
-
     }
 
+});
+
+
+
+/* ---------------- SWITCHERS ---------------- */
+
+document.getElementById("switch-to-register").addEventListener("click", () => {
+    LoginContainer.style.display = "none";
+    RegisterContainer.style.display = "block";
+});
+
+document.getElementById("switch-to-login").addEventListener("click", () => {
+    RegisterContainer.style.display = "none";
+    LoginContainer.style.display = "block";
 });
 
 
@@ -101,34 +109,27 @@ LoginForm.addEventListener("submit", async (e) => {
 todoButton.addEventListener("click", async () => {
 
     const title = todoInput.value;
-
-    const token = localStorage.getItem("token");
+    const token = getStoredToken();
+    if (!token) {
+        alert("Please login first.");
+        LoginContainer.style.display = "block";
+        TodoContainer.style.display = "none";
+        return;
+    }
 
     const response = await fetch("http://localhost:3000/api/v1/user/todo", {
-
         method: "POST",
-
-        headers: {
-            "Content-Type": "application/json",
-            "token": token
-        },
-
+        headers: getAuthHeaders(),
         body: JSON.stringify({ title })
-
     });
 
     const data = await response.json();
 
     if(response.ok){
-
         todoInput.value = "";
-
         loadTodos();
-
-    }else{
-
+    } else {
         alert(data.message);
-
     }
 
 });
@@ -139,35 +140,44 @@ todoButton.addEventListener("click", async () => {
 
 async function loadTodos(){
 
-    const token = localStorage.getItem("token");
+    const token = getStoredToken();
+    if (!token) {
+        LoginContainer.style.display = "block";
+        TodoContainer.style.display = "none";
+        return;
+    }
 
     const response = await fetch("http://localhost:3000/api/v1/user/todo",{
-
         method: "GET",
-
-        headers: {
-            "Content-Type": "application/json",
-            "token": token
-        }
-
+        headers: getAuthHeaders()
     });
 
     const data = await response.json();
 
+    if(!response.ok){
+        alert(data.message || "Failed to load todos");
+        return;
+    }
+
     todoList.innerHTML = "";
 
-    data.data.forEach((todo) => {
+    if(data.todos && Array.isArray(data.todos)){
+        const todoElements = data.todos.map((todo) => {
+            const div = document.createElement("div");
 
-        const div = document.createElement("div");
+            div.innerHTML = `
+                <p>${todo.title}</p>
+                <button onclick="deleteTodo('${todo._id}')">Delete</button>
+            `;
 
-        div.innerHTML = `
-            <p>${todo.title}</p>
-            <button onclick="deleteTodo('${todo._id}')">Delete</button>
-        `;
+            return div;
+        });
 
-        todoList.appendChild(div);
-
-    });
+        todoList.append(...todoElements);
+    } else {
+        console.error("Unexpected data structure:", data);
+        alert("Error loading todos: Invalid response format");
+    }
 
 }
 
@@ -192,4 +202,23 @@ async function deleteTodo(id){
 
     loadTodos();
 
+}
+
+function getStoredToken() {
+    return localStorage.getItem("token");
+}
+
+function getAuthHeaders() {
+    const token = getStoredToken();
+    if (!token) return { "Content-Type": "application/json" };
+
+    return {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+        "token": token, // fallback if backend expects this header
+    };
+}
+
+function extractToken(data) {
+    return data?.token || data?.accessToken || data?.data?.token;
 }

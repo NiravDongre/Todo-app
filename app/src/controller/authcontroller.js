@@ -1,6 +1,7 @@
 const { API_SECRET_KEY } = require("../config/config");
 const { Usermodel } = require("../models/user");
 const { protection } = require("../schema/user.schema");
+const { loginSchema } = require("../schema/user.schema")
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
 
@@ -19,11 +20,15 @@ const signup = async (req, res, next) => {
         });
     }
 
-    const { username, email, password } = createpayload.data;
+    const { username, email, password } = req.body
 
     const existedemail  = await Usermodel.findOne({
-        email: email
-    })
+     $or: [
+    { email: email },
+    { username: username }
+  ]
+})
+
     if(existedemail){
         return res.status(400).json({
             message: "The username or email is already existed"
@@ -51,7 +56,7 @@ const signup = async (req, res, next) => {
 const signin = async (req, res, next) => {
     try {
     const preload = req.body;
-    const postload = protection.safeParse(preload);
+    const postload = loginSchema.safeParse(preload);
 
     if(!postload.success){
         return res.status(400).json({
@@ -59,9 +64,9 @@ const signin = async (req, res, next) => {
         })
     }
 
-    const { username, email ,password } = postload.data;
+    const { username, password } = postload.data;
 
-    if(!username || !password || !email ){
+    if(!username || !password ){
         return res.status(404).json({
             message: "Pls put correct input"
         })

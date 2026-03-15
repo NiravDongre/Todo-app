@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
+<title>Todo App</title>
+</head>
+
+<body>
+
+<!-- Register Section -->
+<div id="Register" style="display: none">
+
+    <h1>Register</h1>
+
+    <form id="register">
+
+        <h4>Username</h4>
+        <input id="reg-username" type="text" placeholder="Username" required>
+
+        <h4>Email</h4>
+        <input id="reg-email" type="email" placeholder="Email" required>
+
+        <h4>Password</h4>
+        <input id="reg-password" type="password" placeholder="Password" required>
+
+        <br><br>
+
+        <button type="submit">Submit</button>
+
+        <br><br>
+
+        <button id="switch-to-login" type="button">Already have an account? Login</button>
+
+    </form>
+
+</div>
+
+
+<!-- Login Section -->
+<div id="Login" style="display: block">
+
+    <h1>Login</h1>
+
+    <form id="login">
+
+        <h4>Username</h4>
+        <input id="login-username" type="text" placeholder="Username" required>
+
+        <h4>Password</h4>
+        <input id="login-password" type="password" placeholder="Password" required>
+
+        <br><br>
+
+        <button type="submit">Submit</button>
+
+        <br><br>
+
+        <button id="switch-to-register" type="button">Don't have an account? Register</button>
+
+    </form>
+
+</div>
+
+
+<!-- Todo Section -->
+<div id="Todo" style="display:none">
+
+<header>
+<h1>Todo App</h1>
+</header>
+
+<main>
+
+<div class="todo-entry">
+    <input id="todo-input" type="text" placeholder="Add Todo here...">
+    <button id="add-todo-btn">Add Todo</button>
+</div>
+
+<br>
+
+<!-- Todos will appear here -->
+<div id="todo-list"></div>
+
+</main>
+
+<footer></footer>
+
+</div>
+
+
+<script src="index.js"></script>
+
+</body>
+</html>

@@ -35,7 +35,7 @@ const getTodo = async(req, res, next) => {
     try{
     const userid = req.userid;
 
-    const todos = await Todomodel.find(userid).select('-__v');
+    const todos = await Todomodel.find({userid}).select('-__v');
     
     if(!todos){
         return res.status(404).json({
