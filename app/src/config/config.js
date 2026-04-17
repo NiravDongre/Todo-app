@@ -1,3 +1,4 @@
+const mongoose = require("mongoose")
 const CustomError = require("../utils/CustomError")
 
 const API_SECRET_KEY = process.env.API_SECRET_KEY
