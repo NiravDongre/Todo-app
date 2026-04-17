@@ -2,9 +2,10 @@ require('dotenv').config()
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path')
-const { user } = require('./app/src/routes/route');
-const { errorMiddleware } = require('./app/src/middleware/error-middleware');
-const cors = require('cors')
+const cors = require('cors');
+const { main } = require('./app/src/config/config');
+const { errorMiddleware } = require('./app/src/middlewares/error-middleware');
+const { router } = require('./app/src/routes/main-route');
 
 
 const app = express();
@@ -13,17 +14,15 @@ app.use(cors());
 
 app.use(express.static(path.join(__dirname, "app/src/public")))
 
-app.use("/api/v1/user", user);
+app.use("/api/v1/", router);
 
 app.use(errorMiddleware);
 
-async function main(){
-    mongoose.set('strictQuery', false);
-    await mongoose.connect(process.env.MONGO_URL)
-    .then(()=> {console.log("connected to db")})
-    .catch(err => console.log(err))
-}
+const PORT = process.env.PORT
 
-main();
+main().then(() => {
+    app.listen((PORT),() => {
+        `The server is running on the ${PORT}`
+    })
+})
 
-app.listen(3000)

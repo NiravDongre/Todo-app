@@ -1,16 +1,14 @@
 const { Router } = require('express');
-const { userMiddleware } = require('../middleware/middleware');
+const { Sign } = require('./auth.route');
+const { User } = require('./user.route');
+const { Todo } = require('./todo.route');
 
+const router = Router();
 
-
-const user = Router();
-
-
-
-
-
-
+router.use("/auth", Sign)
+router.use("/user", User);
+router.use("/todo", Todo)
 
 module.exports = {
-    user
+    router
 }

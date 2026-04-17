@@ -3,21 +3,18 @@ const { Usermodel } = require("../models/user");
 const { protection } = require("../schema/user.schema");
 const { loginSchema } = require("../schema/user.schema")
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const CustomError = require("../utils/CustomError");
+const asyncHandler = require("../utils/asyncHandler");
 
 
-const signup = async (req, res, next) => {
-
-    try{
-
+const signup = asyncHandler(async (req, res) => {
+   
     const payload = req.body;
-    
     const createpayload = protection.safeParse(payload);
 
     if(!createpayload.success){
-        return res.status(400).json({
-            message: "Wrong inputs"
-        });
+        throw new CustomError(400, "Invalid Input")
     }
 
     const { username, email, password } = req.body
@@ -30,64 +27,49 @@ const signup = async (req, res, next) => {
 })
 
     if(existedemail){
-        return res.status(400).json({
-            message: "The username or email is already existed"
-        })
+        throw new CustomError(400, "This User is already sign-up pls try log using sign-in")
     }
 
     const hashing = await bcrypt.hash(password, 10);
 
-    await Usermodel.create({
+    const user = await Usermodel.create({
         username,
         email,
         password: hashing
     })
 
+    if(!user){
+        throw new CustomError(400, "Try Again")
+    }
+
     return res.status(201).json({
         message: "User has Signed Up"
     })
 
-   }catch(e){
-    next(e)
-   }
+})
 
-}
-
-const signin = async (req, res, next) => {
-    try {
+const signin = asyncHandler(async (req, res) => {
     const preload = req.body;
     const postload = loginSchema.safeParse(preload);
 
     if(!postload.success){
-        return res.status(400).json({
-            message: "Wrong input"
-        })
+        throw new CustomError(400, "Invalid Input")
     }
 
     const { username, password } = postload.data;
-
-    if(!username || !password ){
-        return res.status(404).json({
-            message: "Pls put correct input"
-        })
-    }
 
     const user = await Usermodel.findOne({
         username: username
     })
     
     if(!user){
-        return res.status(404).json({
-            message: "Incorrect Cred"
-        })
+        throw new CustomError(400, "Incorrect Credintials")
     }
 
     const passing = await bcrypt.compare(password, user.password)
 
     if(!passing){
-        return res.json({
-            message: "Incorrect password"
-        })
+        throw new CustomError(400, "Incorrect Password")
     }
 
     const token = jwt.sign(
@@ -97,14 +79,10 @@ const signin = async (req, res, next) => {
 
     return res.status(200).json({
         token: token,
-        message: "User can login through this token"
+        message: "User has Logged-In"
     })
 
-}catch(e){
-    next(e)
- }
-}
-
+})
 
 module.exports = {
     signup, signin

@@ -1,90 +1,71 @@
-const { Todomodel } = require('../models/todo') 
+const { Todomodel } = require('../models/todo'); 
+const asyncHandler = require('../utils/asyncHandler');
+const CustomError = require('../utils/CustomError');
 
 
-const todo = async(req, res, next) => {
+const todo = asyncHandler(async(req, res) => {
     const user = req.userid;
     const { title } = req.body;
-    if(!title){
-        return res.json({
-            message: "Incorrect Credintial"
-        })
-    }
-    try{
-     const todo =  await Todomodel.create({
+
+    if(!title){ throw new CustomError(400, "Invalid Title")}
+
+    const todo =  await Todomodel.create({
         title: title,
         complete: false,
         userid: user
     })
-    if(!todo){
-        return res.status(404).json({
-            message: "Incorrect Credintial"
-        })
-    }
+
+    if(!todo){ throw new CustomError(404, "Todo's not Created")}
+
     return res.status(201).json({
         message: "Todo has created",
         todo: todo
     })
-}catch(e){
-    next(e)
-}
-}
+})
 
 
-const getTodo = async(req, res, next) => {
+const gettodo = asyncHandler(async(req, res) => {
     
-    try{
     const userid = req.userid;
 
     const todos = await Todomodel.find({userid}).select('-__v');
     
-    if(!todos){
-        return res.status(404).json({
-            message: "User not found"
-        })
-    }
+    if(!todos){ throw new CustomError(404, "Not Found")}
 
     return res.status(200).json({
         todos: todos
     })
-}catch(e){
-    next(e)
-}
-}
+})
 
 
-const updatetodo = async(req, res, next) => {
-    try{
-        const userid = req.userid;
-        const todoid = req.params.id;
-        const { title, complete } = req.body;
+const updatetodo = asyncHandler(async(req, res) => {
 
-        const todos = await Todomodel.findOneAndUpdate(
-        { userid: userid , _id: todoid},
-        {
-            title: title,
-            complete: complete,
-        },{new: true}).select("-__v")
-
-
-        if(!todos){
-            return res.status(403).json({
-                message: "Not authrized or todo not found"
-            })
-        }
-
-        return res.status(200).json({
-            user: "The updated todo is here",
-            todos: todos
-        })
-    }catch(e){
-        next(e)
-    }
-}
-
-const deletetodo = async (req, res, next) => {
-    try{
-    const user = req.userid;
+    const userid = req.userid;
     const todoid = req.params.id;
+    const { title, complete } = req.body;
+
+    const todos = await Todomodel.findOneAndUpdate(
+    { userid: userid,
+     _id: todoid },
+    {
+        title: title,
+        complete: complete,
+    },{new: true}).select("-__v")
+
+
+    if(!todos){throw new CustomError(403, "Not authrized or Todo not found")}
+
+    return res.status(200).json({
+        user: "The updated todo is here",
+        todos: todos
+    })
+
+})
+
+const deletetodo = asyncHandler(async (req, res) => {
+
+    const user = req.userid;
+    const todoid = req.params.id
     
     const todos = await Todomodel.findOneAndDelete(
         {
@@ -92,20 +73,13 @@ const deletetodo = async (req, res, next) => {
             _id: todoid
         });
 
-    if(!todos){
-        return res.status(403).json({
-            message: "Not authrized or Todo not found"
-        })
-    }
+    if(!todos){ throw new CustomError(403, "Not authrized or Todo not found")}
 
     return res.status(200).json({
         message: "the todo got deleted"
     })
-    } catch(e){
-        next(e)
-    }
-}
+})
 
 module.exports = {
-    todo, getTodo, updatetodo, deletetodo
+    todo, gettodo, updatetodo, deletetodo
 }

@@ -5,9 +5,8 @@ const ObjectId = Schema.ObjectId;
 const todo = new Schema({
     title: String,
     complete: {type: Boolean, default: false},
-    userid: { type: ObjectId } ,
-    createdAt: {type: Date, default: Date.now}
-})
+    userid: { type: ObjectId }
+},{ timestamps: true })
 
 const Todomodel = mongoose.model("todo", todo);
 
