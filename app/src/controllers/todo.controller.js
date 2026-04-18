@@ -25,15 +25,26 @@ const todo = asyncHandler(async(req, res) => {
 
 
 const gettodo = asyncHandler(async(req, res) => {
-    
-    const userid = req.userid;
+    const userId = req.userId;
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.min(50 ,Math.max(1, Number(req.query.limit) || 10));
+    const skip = ( page - 1)* limit
 
-    const todos = await Todomodel.find({userid}).select('-__v');
-    
-    if(!todos){ throw new CustomError(404, "Not Found")}
-
+    const [ total, todos ] = await Promise.all([ 
+    Todomodel.countDocuments({userId}),
+    Todomodel.find({userId})
+    .skip(skip)
+    .limit(limit)
+    .sort("-createdAt")
+    .select('-__v')
+])
     return res.status(200).json({
-        todos: todos
+        status: "success",
+        results: todos.length,
+        total,
+        page,
+        totalPages: Math.ceil(total / limit),
+        data: todos
     })
 })
 
