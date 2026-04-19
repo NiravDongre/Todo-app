@@ -1,352 +1,211 @@
-# Todo App – Secure Task Management API
+# 🚀 Production-Ready Task API with Secure Authentication
 
-A **secure Todo Management API** built using **Node.js, Express, and MongoDB**.
-This project demonstrates **authentication, middleware protection, schema validation, and full CRUD operations** for managing user tasks.
-
-The backend follows a **modular architecture** with separate folders for controllers, routes, middleware, schemas, and models to keep the codebase clean and scalable.
+A clean, production-ready backend for a Todo application built with a strong focus on **simplicity, security, and reliability**.
 
 ---
 
-# Features
+## ✨ Overview
 
-## Authentication System
+This project is a **RESTful API** that allows users to:
 
-* User Signup
-* User Signin
-* JWT Token Authentication
-* Protected Routes using Middleware
+* Register and log in securely
+* Manage their personal todos (create, read, update, delete)
+* Access only their own data
 
-## Todo Management
-
-* Create Todo
-* Fetch All Todos
-* Update Todo
-* Delete Todo
-
-## Profile Management
-
-* Get User Profile
-* Edit User Profile
-
-## Validation & Security
-
-* Request validation using Zod
-* Middleware based authentication
-* Environment variable configuration
+Despite being simple to use, the system is designed with **real-world backend practices**.
 
 ---
 
-# Tech Stack
+## 🌐 Repository
 
-Backend
+👉 [https://github.com/NiravDongre/Todo-app.git](https://github.com/NiravDongre/Todo-app.git)
+
+---
+
+## 🔐 Security First
+
+Security is built into the core:
+
+* **JWT Authentication** (Access + Refresh Tokens)
+* **Refresh Token Rotation** (secure session lifecycle)
+* **Password hashing** using bcrypt
+* **Rate limiting** to prevent abuse
+* **MongoDB sanitization** to avoid injection attacks
+* **Helmet** for secure HTTP headers
+* **Protected routes** (user-specific access only)
+
+---
+
+## ⚡ Key Features
+
+* ✅ User Signup & Login
+* ✅ JWT-based Authentication
+* ✅ Refresh & Logout system
+* ✅ CRUD Operations on Todos
+* ✅ Pagination for scalable data fetching
+* ✅ Profile management
+* ✅ Global Error Handling
+* ✅ Input Validation using Zod
+
+---
+
+## 🧱 Project Structure
+
+```
+app/src/
+├── config/
+├── controllers/
+├── middlewares/
+├── models/
+├── routes/
+├── utils/
+├── validations/
+```
+
+✔ Modular
+✔ Scalable
+✔ Maintainable
+
+---
+
+## 🔑 Authentication Flow (Simple & Secure)
+
+1. User logs in → receives:
+
+   * Access Token (short-lived)
+   * Refresh Token (long-lived)
+
+2. Access Token is used for protected routes
+
+3. When expired → Refresh Token generates new tokens
+
+4. Refresh Token is rotated for better security
+
+5. Logout invalidates session
+
+---
+
+## 📡 API Endpoints
+
+### 🔐 Auth
+
+* `POST /api/v1/auth/signup`
+* `POST /api/v1/auth/signin`
+* `POST /api/v1/auth/refresh`
+* `POST /api/v1/auth/logout`
+
+### 📝 Todos (Protected)
+
+* `POST /api/v1/todo/add` → Create todo
+* `GET /api/v1/todo/todos` → Get all todos (pagination)
+* `PUT /api/v1/todo/todos/:id` → Update todo
+* `DELETE /api/v1/todo/todos/:id` → Delete todo
+
+### 👤 User (Protected)
+
+* `GET /api/v1/user/profile` → Get profile
+* `PUT /api/v1/user/profile/edit/:id` → Edit profile
+
+---
+
+## 📥 Example Request
+
+### Create Todo
+
+```
+POST /api/v1/add
+Authorization: Bearer <accessToken>
+```
+
+```json
+{
+  "title": "Learn backend"
+}
+```
+
+---
+
+## 📊 Pagination Example
+
+```
+GET /api/v1/todos?page=1&limit=10
+```
+
+```json
+{
+  "status": "success",
+  "results": 10,
+  "total": 42,
+  "page": 1,
+  "totalPages": 5,
+  "data": []
+}
+```
+
+---
+
+## 🛠️ Tech Stack
 
 * Node.js
 * Express.js
-* MongoDB
-
-Validation
-
-* Zod Schema Validation
-
-Authentication
-
-* JSON Web Tokens (JWT)
-
-Tools
-
-* Postman for API testing
-* Nodemon for development
-* Git & GitHub for version control
+* MongoDB + Mongoose
+* JWT (jsonwebtoken)
+* bcrypt
+* Zod (validation)
 
 ---
 
-# Project Structure
+## ⚙️ Setup Instructions
 
-```text
-TODO-APP
-│
-├── app/src
-│   ├── config
-│   │   └── config.js
-│   │
-│   ├── controller
-│   │   ├── authcontroller.js
-│   │   ├── todocontroller.js
-│   │   └── usercontroller.js
-│   │
-│   ├── middleware
-│   │   ├── middleware.js
-│   │   └── error-middleware.js
-│   │
-│   ├── models
-│   │   ├── todo.js
-│   │   └── user.js
-│   │
-│   ├── public
-│   │   ├── index.html
-│   │   ├── style.css
-│   │   └── index.js
-│   │
-│   ├── routes
-│   │   └── route.js
-│   │
-│   └── schema
-│       └── user.schema.js
-│
-├── .env
-├── .env.example
-├── .gitignore
-│
-├── index.js
-├── package.json
-├── package-lock.json
-└── README.md
-```
-
----
-
-# API Base URL
+### 1. Clone the repo
 
 ```
-http://localhost:3000/api/v1/user
+git clone https://github.com/NiravDongre/Todo-app.git
+cd Todo-app
 ```
 
----
-
-# Authentication Routes
-
-## Signup
-
-POST `/signup`
-
-Request Body
-
-```json
-{
-  "username": "john",
-  "email": "john@example.com",
-  "password": "Password123"
-}
-```
-
----
-
-## Signin
-
-POST `/signin`
-
-Request Body
-
-```json
-{
-  "username": "john",
-  "email": "john@example.com",
-  "password": "Password123"
-}
-```
-
-Response
-
-```json
-{
-  "token": "JWT_TOKEN"
-}
-```
-
-This token must be used in **protected routes**.
-
----
-
-# Profile Routes
-
-## Get Profile
-
-GET `/profile`
-
-Headers
-
-```
-token: YOUR_JWT_TOKEN
-```
-
----
-
-## Edit Profile
-
-PUT `/profile/edit/:id`
-
-Headers
-
-```
-token: YOUR_JWT_TOKEN
-```
-
----
-
-# Todo Routes
-
-All Todo routes require authentication.
-
----
-
-## Create Todo
-
-POST `/todo`
-
-Headers
-
-```
-token: YOUR_JWT_TOKEN
-```
-
-Body
-
-```json
-{
-  "title": "Learn Express.js"
-}
-```
-
----
-
-## Get All Todos
-
-GET `/todo`
-
-Headers
-
-```
-token: YOUR_JWT_TOKEN
-```
-
----
-
-## Update Todo
-
-PUT `/todo/:id`
-
-Headers
-
-```
-token: YOUR_JWT_TOKEN
-```
-
-Body
-
-```json
-{
-  "title": "Updated Todo"
-}
-```
-
----
-
-## Delete Todo
-
-DELETE `/todo/:id`
-
-Headers
-
-```
-token: YOUR_JWT_TOKEN
-```
-
----
-
-# Validation
-
-User input validation is implemented using **Zod**.
-
-Validation schema example:
-
-```javascript
-const { z } = require("zod")
-
-const protection = z.object({
-  username: z.string().min(4).max(10),
-  email: z.string().email().max(100),
-  password: z.string().min(3).max(10)
-})
-```
-
-This ensures only valid data is accepted by the API.
-
----
-
-# Installation
-
-Clone the repository
-
-```
-git clone https://github.com/yourusername/todo-app.git
-```
-
-Move into project folder
-
-```
-cd todo-app
-```
-
-Install dependencies
+### 2. Install dependencies
 
 ```
 npm install
 ```
 
-Create `.env` file
+### 3. Configure environment
 
-Example:
-
-```
-
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_secret_key
-```
-
-Start server
+Create a `.env` file:
 
 ```
-node index.js
+PORT=3000
+MONGO_URL=your_mongodb_uri
+API_SECRET_KEY=your_access_secret
+REFRESH_API_KEY=your_refresh_secret
 ```
 
-Server will run at
+### 4. Run the server
 
 ```
-http://localhost:3000
+npm run dev
 ```
 
 ---
 
-# API Testing
+## 🧠 Why This Project Stands Out
 
-The API can be tested using:
+* Clean architecture (modular folders)
+* Real-world authentication system
+* Secure by design
+* Scalable patterns
 
-* Postman
-* Thunder Client
-* URL
-
-Basic testing flow:
-
-1. Signup user
-2. Signin to receive JWT token
-3. Use token in headers
-4. Perform Todo CRUD operations
+👉 Simple to use for clients, powerful under the hood
 
 ---
 
-# Future Improvements
+## 📌 Final Note
 
-* Swagger API documentation
-* Todo priority system
-* Deadlines for tasks
-* Pagination for large todo lists
-* Role-based authentication
-* Making frontend 
+This project demonstrates how a backend can remain **simple for users** while being **robust, secure, and production-ready**.
 
 ---
 
-# Author
+## 👨‍💻 Author
 
-Built by **NiravDongre**
-
-Backend developer focused on **Node.js, Express, and scalable API development**.
+Nirav Dongre
