@@ -3,7 +3,7 @@ const asyncHandler = require("../utils/asyncHandler");
 const CustomError = require("../utils/CustomError");
 
 const profile = asyncHandler(async(req, res, next) => {
-    const user = req.userid;
+    const user = req.userId;
 
     const profile = await Usermodel.findById(user, "-password -email -__v")
 

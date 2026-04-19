@@ -4,7 +4,7 @@ const CustomError = require('../utils/CustomError');
 
 
 const todo = asyncHandler(async(req, res) => {
-    const user = req.userid;
+    const user = req.userId;
     const { title } = req.body;
 
     if(!title){ throw new CustomError(400, "Invalid Title")}
@@ -12,7 +12,7 @@ const todo = asyncHandler(async(req, res) => {
     const todo =  await Todomodel.create({
         title: title,
         complete: false,
-        userid: user
+        userId: user
     })
 
     if(!todo){ throw new CustomError(404, "Todo's not Created")}
@@ -75,7 +75,7 @@ const updatetodo = asyncHandler(async(req, res) => {
 
 const deletetodo = asyncHandler(async (req, res) => {
 
-    const user = req.userid;
+    const user = req.userId;
     const todoid = req.params.id
     
     const todos = await Todomodel.findOneAndDelete(

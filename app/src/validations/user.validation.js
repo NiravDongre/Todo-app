@@ -7,7 +7,6 @@ const protection = z.object({
     .min(4),
 
     email: z
-    .string()
     .email()
     .max(100,{message:"Email must be no longer than 100 characters."}),
 

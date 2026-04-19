@@ -13,13 +13,13 @@ const app = express();
 app.use(helmet());
 
 const limit = ratelimit({
-    max: 1000,
+    max: 100,
     windowMs: 60 * 60* 1000,
     message: "We have recieved too many req from this IP. Pls try again after one hour"
 })
 
 app.use(express.json());
-app.use(mongosanitize());
+
 app.use(cors());
 
 app.use("/api/v1", limit)
