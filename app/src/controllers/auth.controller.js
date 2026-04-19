@@ -79,10 +79,20 @@ const signin = asyncHandler(async (req, res) => {
 
 })
 
-const logout = asyncHandler(async(req, res, next) => {
-    
+const logout = asyncHandler(async(req, res) => {
+
+    const userId = req.userId
+
+    const user = await Usermodel.findById(userId);
+
+    user.refreshToken = null
+    await user.save();
+
+    return res.json({
+        message: "Loggout successfully"
+    })
 })
 
 module.exports = {
-    signup, signin
+    signup, signin, logout 
 }
