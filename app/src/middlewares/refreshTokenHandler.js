@@ -12,8 +12,6 @@ const RefreshTokenHandler = asyncHandler(async (req, res) =>{
     if(!authorization || !authorization.startsWith("Bearer ")){ throw new CustomError(401, "Authorization Token Required") }
 
     const token = authorization.split(" ")[1]
-    
-    if(!token){ throw new CustomError(401,"token required")}
 
     let response;
 
@@ -24,22 +22,34 @@ const RefreshTokenHandler = asyncHandler(async (req, res) =>{
         throw new CustomError(401, "Token Expired or Invalid")
     }
 
+    if(!response){
+        return new CustomError(404, "User not found")
+    }
+
     const user = await Usermodel.findById(response.userId);
 
-    const newAccessToken = jwt.sign({userId: user._id}, API_SECRET_KEY, 
+    if(!user){
+        throw new CustomError(404, "User not Found")
+    }
+
+    if(user.refreshToken !== token){
+        throw new CustomError(401, "Invalid token")
+    }
+
+    const newaccesstoken = jwt.sign({userId: user._id}, API_SECRET_KEY, 
         {expiresIn: "15m"}
     )
 
-    const newRefreshToken = jwt.sign({userId: user._id}, API_SECRET_KEY, 
+    const newrefreshtoken = jwt.sign({userId: user._id}, REFRESH_API_KEY, 
         {expiresIn: "15d"}
     )
 
-    user.refreshToken = newRefreshToken;
+    user.refreshToken = newrefreshtoken;
     await user.save()
 
     return res.json({
-        newAccessToken,
-        newRefreshToken
+        newaccesstoken,
+        newrefreshtoken
     })
 })
 
