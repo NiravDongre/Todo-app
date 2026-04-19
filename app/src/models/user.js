@@ -7,7 +7,8 @@ const user = new Schema({
     password: {type: String, default: "123456"},
     name: { type: String ,  maxLength:100 },
     bio: { type: String , maxLenght: 300 },
-    Image: { type: String }
+    Image: { type: String },
+    refreshToken: { type: String, default: null}
 },{ timestamps: true }
 )
 

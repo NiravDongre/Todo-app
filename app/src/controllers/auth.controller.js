@@ -1,4 +1,4 @@
-const { API_SECRET_KEY } = require("../config/config");
+const { API_SECRET_KEY, REFRESH_API_KEY } = require("../config/config");
 const { Usermodel } = require("../models/user");
 const { protection, loginSchema } = require("../validations/user.validation");
 const bcrypt = require('bcrypt');
@@ -59,17 +59,28 @@ const signin = asyncHandler(async (req, res) => {
     if(!user || !passing){
         throw new CustomError(400, "Incorrect Password")
     }
+
+    const userId = user._id;
     
-    const token = jwt.sign(
-        {userId : user._id},
-         API_SECRET_KEY ,
-        { expiresIn: 60 * 60 * 24 });
+    const accesstoken = jwt.sign( {userId}, API_SECRET_KEY ,
+    { expiresIn: "15m" });
+
+    const refreshtoken = jwt.sign( {userId, email: user.email}, REFRESH_API_KEY, 
+    { expiresIn: 60 * 60 * 24 * 15});
+
+    user.refreshToken = refreshtoken;
+    await user.save()
 
     return res.status(200).json({
-        token: token,
+        accesstoken,
+        refreshtoken,
         message: "User has Logged-In"
     })
 
+})
+
+const logout = asyncHandler(async(req, res, next) => {
+    
 })
 
 module.exports = {
